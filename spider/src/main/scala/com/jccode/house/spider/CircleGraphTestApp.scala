@@ -52,7 +52,7 @@ object CircleGraphTestApp extends App {
         val bcast = b.add(Broadcast[(Int, Option[String])](2))
 
         val outFilter =
-          b.add(Flow[(Int, Option[String])].filter(_._2.isEmpty).map(_._1))
+          b.add(Flow[(Int, Option[String])].map(_._1))
 
 
         val notOutFilter =
