@@ -1,10 +1,15 @@
-package com.jccode.house.spider
+package com.jccode.house.spider.t
 
 import akka.NotUsed
 import akka.actor.ActorSystem
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, MergePreferred, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, ClosedShape, FlowShape}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Merge, MergePreferred, RunnableGraph, Sink, Source}
 
+/**
+  * CircleGraphTestApp
+  *
+  * @author 01372461
+  */
 object CircleGraphTestApp extends App {
 
   implicit val actorSystem = ActorSystem()

@@ -37,7 +37,7 @@ object SpiderApp extends App {
     import GraphDSL.Implicits._
 
     val bcast = b.add(Broadcast[String](2))
-    val merge = b.add(Merge[Seq[BeiKe]](2))
+    val merge = b.add(Merge[Seq[House]](2))
 
     sourceSeedUrl ~> bcast ~> flowModels ~> merge ~> sink
                      bcast ~> flowRemains ~> merge
