@@ -64,7 +64,7 @@ lazy val slickCodeGenTask = Def.task {
   val pkg = "com.github.jccode.house.dao"
   val slickProfile = "slick.jdbc.MySQLProfile"
   val jdbcDriver = "com.mysql.jdbc.Driver"
-  val url = "jdbc:mysql://localhost:3306/house?useUnicode=true&characterEncoding=UTF-8"
+  val url = "jdbc:mysql://localhost:3306/housedb?useUnicode=true&characterEncoding=UTF-8"
   val user = "jc"
   val password = "jc"
   val included = ""

@@ -35,7 +35,7 @@ object SpiderApp extends App {
 
   val sinkLog = Sink.foreach(println)
   val sinkDb = Slick.sink[House] { h: House =>
-    houses.filter(_.url === h.url).exists.result.flatMap { exist =>
+    val r = houses.filter(_.url === h.url).exists.result.flatMap { exist =>
       if (!exist) {
         val now = new Timestamp(System.currentTimeMillis())
         houses += HouseItem(0,
@@ -48,8 +48,20 @@ object SpiderApp extends App {
         DBIO.successful(0)
       }
     }
+
+    seeds.result.flatMap { list =>
+      DBIO.sequence(
+        list.map { i =>
+          val now = new Timestamp(System.currentTimeMillis())
+          seeds.filter(_.id === i.id).map(_.lastFetchTime).update(Some(now))
+        }
+      )
+    }
+
+    r
   }
   val sinkDb2 = Flow[List[House]].mapConcat(identity).toMat(sinkDb)(Keep.right)
+
 
   val g: RunnableGraph[Future[Done]] = RunnableGraph.fromGraph(GraphDSL.create(sinkDb2) { implicit b => sink =>
     import GraphDSL.Implicits._
