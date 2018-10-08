@@ -5,7 +5,7 @@ import play.api.libs.json.Json
 
 
 
-case class House(url: String, title: Option[String] = None, housingEstate: Option[String] = None, houseType: Option[String] = None, area: Option[Float] = None, totalPrice: Option[Double] = None, unitPrice: Option[Double] = None, orientation: Option[String] = None, decoration: Option[String] = None, elevator: Option[String] = None, floorDesc: Option[String] = None, age: Option[Int] = None, subDistrict: Option[String] = None, publishDateDesc: Option[String] = None, tags: Option[String] = None)
+case class House(url: String, title: Option[String] = None, housingEstate: Option[String] = None, houseType: Option[String] = None, area: Option[Float] = None, totalPrice: Option[Double] = None, unitPrice: Option[Double] = None, orientation: Option[String] = None, decoration: Option[String] = None, elevator: Option[String] = None, floorDesc: Option[String] = None, age: Option[Int] = None, subDistrict: Option[String] = None, publishDateDesc: Option[String] = None, tags: Option[String] = None, housingEstateNo: Option[String] = None)
 
 case class PageData(totalPage: Int, curPage: Int)
 
@@ -41,6 +41,7 @@ class BeiKeParse extends Parser[House] {
       val tag = tags.asScala.collect {
         case _ @ i if i.className() != "is_vr" => i.text
       }.mkString(",")
+      val housingEstateUrl = e.select("div.info.clear div.address div.houseInfo a").attr("href")
 
       House(
         $title.attr("href"),
@@ -57,7 +58,8 @@ class BeiKeParse extends Parser[House] {
         subDistrict = pos.lift(1),
         age = pos.lift(0).flatMap(extractAge),
         publishDateDesc = foll.lift(2),
-        tags = Some(tag)
+        tags = Some(tag),
+        housingEstateNo = extractHousingEstateNo(housingEstateUrl)
       )
     }.toList
   }
@@ -99,6 +101,11 @@ class BeiKeParse extends Parser[House] {
   def extractAge(s: String): Option[Int] = {
     val p = """(\d+)年""".r
     p.findFirstMatchIn(s).map(_.group(1).toInt)
+  }
+
+  def extractHousingEstateNo(url: String): Option[String] = {
+    val p = """http[s]://(.+).ke.com/xiaoqu/(.+)/""".r
+    p.findFirstMatchIn(url).map(_.group(2))
   }
 }
 

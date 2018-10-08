@@ -29,5 +29,19 @@ create table house
   last_fetch_time datetime null comment '上次抓取时间',
   create_time datetime default CURRENT_TIMESTAMP not null,
   update_time datetime default CURRENT_TIMESTAMP not null,
-  constraint seed_url_uindex unique (url)
+  constraint house_url_uindex unique (url)
 ) comment '房屋' charset = utf8;
+
+create table housing_estate
+(
+  id int auto_increment primary key,
+  no varchar(32) not null comment '编号',
+  name varchar(64) not null comment '名称',
+  avg_price double comment '均价',
+  lowest_price double comment '最低价',
+  deal_hist varchar(2048) null comment '成交记录',
+  last_fetch_time datetime null comment '上次抓取时间',
+  create_time datetime default CURRENT_TIMESTAMP not null,
+  update_time datetime default CURRENT_TIMESTAMP not null,
+  constraint housing_estate_no_uindex unique (no)
+) comment '小区' charset = utf8;
