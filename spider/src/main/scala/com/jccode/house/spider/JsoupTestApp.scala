@@ -28,6 +28,7 @@ object JsoupTestApp extends App {
   val curPage = pageData \ "curPage"
 
   println(doc.location())
+  println(pageUrl)
   println(s"$totalPage / $curPage")
   println("---===---")
 }
