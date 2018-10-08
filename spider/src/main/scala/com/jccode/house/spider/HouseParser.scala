@@ -4,26 +4,10 @@ import org.jsoup.nodes.Document
 import play.api.libs.json.Json
 
 
-
 case class House(url: String, title: Option[String] = None, housingEstate: Option[String] = None, houseType: Option[String] = None, area: Option[Float] = None, totalPrice: Option[Double] = None, unitPrice: Option[Double] = None, orientation: Option[String] = None, decoration: Option[String] = None, elevator: Option[String] = None, floorDesc: Option[String] = None, age: Option[Int] = None, subDistrict: Option[String] = None, publishDateDesc: Option[String] = None, tags: Option[String] = None, housingEstateNo: Option[String] = None)
 
-case class PageData(totalPage: Int, curPage: Int)
-
-object PageData {
-  implicit val pageDataReads = Json.reads[PageData]
-}
-
-
-trait Parser[R] {
-  def parse(doc: Document): (List[R], Option[List[String]])
-  def models(doc: Document): List[R]
-  def remainPages(doc: Document): Option[List[String]]
-}
-
-class BeiKeParse extends Parser[House] {
+class HouseParser extends Parser[House] {
   import scala.collection.JavaConverters._
-
-  override def parse(doc: Document): (List[House], Option[List[String]]) = (models(doc), remainPages(doc))
 
   override def models(doc: Document): List[House] = {
     val els = doc.select("body > div.content > div.leftContent > ul > li")
@@ -109,6 +93,6 @@ class BeiKeParse extends Parser[House] {
   }
 }
 
-object BeiKeParse {
-  def apply(): BeiKeParse = new BeiKeParse()
+object HouseParser {
+  def apply(): HouseParser = new HouseParser()
 }

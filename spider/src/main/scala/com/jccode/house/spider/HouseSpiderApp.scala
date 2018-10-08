@@ -7,13 +7,13 @@ import akka.actor.ActorSystem
 import akka.stream.alpakka.slick.scaladsl.{Slick, SlickSession}
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, Merge, RunnableGraph, Sink}
 import akka.stream.{ActorMaterializer, ClosedShape}
-import com.github.jccode.house.dao.Tables.{House => HouseItem, _}
+import com.github.jccode.house.dao.Tables.{House => HouseItem, HousingEstate => HousingEstateItem, _}
 import org.jsoup.Jsoup
 
 import scala.concurrent.Future
 
 
-object SpiderApp {
+object HouseSpiderApp {
 
   implicit val actorSystem = ActorSystem()
   implicit val materializer = ActorMaterializer()
@@ -22,7 +22,7 @@ object SpiderApp {
   import session.profile.api._
 
   def main(args: Array[String]): Unit = {
-    val parser = BeiKeParse()
+    val parser = HouseParser()
 
     val sourceSeedUrl = Slick.source(seeds.result).map(_.url)
 
@@ -51,7 +51,7 @@ object SpiderApp {
       }
       val action2 = housingEstates.filter(_.no === h.housingEstateNo).exists.result.flatMap { exist =>
         if (!exist) {
-          housingEstates += HousingEstate(0, no = h.housingEstateNo.get, name = h.housingEstate.get, createTime = now, updateTime = now)
+          housingEstates += HousingEstateItem(0, no = h.housingEstateNo.get, name = h.housingEstate.get, createTime = now, updateTime = now)
         } else {
           DBIO.successful(0)
         }
