@@ -15,17 +15,17 @@ object PageData {
 
 
 trait Parser[R] {
-  def parse(doc: Document): (Seq[R], Option[List[String]])
-  def models(doc: Document): Seq[R]
+  def parse(doc: Document): (List[R], Option[List[String]])
+  def models(doc: Document): List[R]
   def remainPages(doc: Document): Option[List[String]]
 }
 
 class BeiKeParse extends Parser[House] {
   import scala.collection.JavaConverters._
 
-  override def parse(doc: Document): (Seq[House], Option[List[String]]) = (models(doc), remainPages(doc))
+  override def parse(doc: Document): (List[House], Option[List[String]]) = (models(doc), remainPages(doc))
 
-  override def models(doc: Document): Seq[House] = {
+  override def models(doc: Document): List[House] = {
     val els = doc.select("body > div.content > div.leftContent > ul > li")
     els.asScala.map {e =>
       val $title = e.select("div.info.clear > div.title > a")
@@ -59,7 +59,7 @@ class BeiKeParse extends Parser[House] {
         publishDateDesc = foll.lift(2),
         tags = Some(tag)
       )
-    }
+    }.toList
   }
 
   override def remainPages(doc: Document): Option[List[String]] = {

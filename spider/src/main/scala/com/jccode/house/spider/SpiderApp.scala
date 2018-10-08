@@ -1,11 +1,13 @@
 package com.jccode.house.spider
 
-import akka.{Done, NotUsed}
+import java.sql.Timestamp
+
+import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.alpakka.slick.scaladsl.{Slick, SlickSession}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Merge, RunnableGraph, Sink}
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Keep, Merge, RunnableGraph, Sink}
 import akka.stream.{ActorMaterializer, ClosedShape}
-import com.github.jccode.house.dao.Tables._
+import com.github.jccode.house.dao.Tables.{House => HouseItem, _}
 import org.jsoup.Jsoup
 
 import scala.concurrent.Future
@@ -32,12 +34,28 @@ object SpiderApp extends App {
     .via(flowModels)
 
   val sinkLog = Sink.foreach(println)
+  val sinkDb = Slick.sink[House] { h: House =>
+    houses.filter(_.url === h.url).exists.result.flatMap { exist =>
+      if (!exist) {
+        val now = new Timestamp(System.currentTimeMillis())
+        houses += HouseItem(0,
+          url = h.url, title = h.title, housingEstate = h.housingEstate, houseType = h.houseType, area = h.area,
+          totalPrice = h.totalPrice, unitPrice = h.unitPrice, orientation = h.orientation, decoration = h.decoration,
+          elevator = h.elevator, floorDesc = h.floorDesc, age = h.age, subDistrict = h.subDistrict,
+          publishDateDesc = h.publishDateDesc, createTime = now, updateTime = now
+        )
+      } else {
+        DBIO.successful(0)
+      }
+    }
+  }
+  val sinkDb2 = Flow[List[House]].mapConcat(identity).toMat(sinkDb)(Keep.right)
 
-  val g: RunnableGraph[Future[Done]] = RunnableGraph.fromGraph(GraphDSL.create(sinkLog) { implicit b => sink =>
+  val g: RunnableGraph[Future[Done]] = RunnableGraph.fromGraph(GraphDSL.create(sinkDb2) { implicit b => sink =>
     import GraphDSL.Implicits._
 
     val bcast = b.add(Broadcast[String](2))
-    val merge = b.add(Merge[Seq[House]](2))
+    val merge = b.add(Merge[List[House]](2))
 
     sourceSeedUrl ~> bcast ~> flowModels ~> merge ~> sink
                      bcast ~> flowRemains ~> merge
