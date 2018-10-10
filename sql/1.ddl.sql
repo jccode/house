@@ -42,6 +42,8 @@ create table housing_estate
   deal_hist varchar(2048) null comment '成交记录',
   selling_count int null comment '正在出售',
   sold_count int null comment '近30天成交',
+  district varchar(16) null comment '区',
+  sub_district varchar(32) null comment '片区',
   last_fetch_time datetime null comment '上次抓取时间',
   create_time datetime default CURRENT_TIMESTAMP not null,
   update_time datetime default CURRENT_TIMESTAMP not null,
