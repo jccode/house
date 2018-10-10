@@ -2,7 +2,7 @@ package com.jccode.house.spider
 import play.api.libs.json.Json
 
 
-case class HousingEstate(no: String, name: String, avgPrice: Option[Double] = None, lowestPrice: Option[Double] = None, sellingCount: Option[Int] = None, soldCount: Option[Int] = None, dealHist: Option[String] = None)
+case class HousingEstate(no: String, name: String, avgPrice: Option[Double] = None, lowestPrice: Option[Double] = None, dealHist: Option[String] = None, sellingCount: Option[Int] = None, soldCount: Option[Int] = None, district: Option[String] = None, subDistrict: Option[String] = None)
 
 case class DealHist(date: String, price: String, unitPrice: String, title: String, period: String) {
   override def toString: String = s"$date|$price|$unitPrice|$title|$period"
@@ -48,16 +48,18 @@ class HousingEstateParser {
       )
     }
 
-    val lowest = list.map(x => toDouble(x.unitPrice)).fold(Double.MaxValue) {(prev, curr) => prev.min(curr)}
+    val lowest = if(list.isEmpty) None else Some(list.map(x => toDouble(x.unitPrice)).fold(Double.MaxValue) {(prev, curr) => prev.min(curr)})
     val dealHist = list.mkString(";\n")
 
     HousingEstate(no = housingEstateNo,
       name = baseInfo.get.name,
       avgPrice = baseInfo.map(_.unitPrice),
-      lowestPrice = Some(lowest),
+      lowestPrice = lowest,
       sellingCount = baseInfo.map(_.sellNum.toInt),
       soldCount = baseInfo.map(_.`90saleCount`),
       dealHist = Some(dealHist),
+      district = baseInfo.map(_.districtName),
+      subDistrict = baseInfo.map(_.bizcircleName)
     )
   }
 
