@@ -43,7 +43,7 @@ object HouseSpiderApp {
             url = h.url, title = h.title, housingEstate = h.housingEstate, houseType = h.houseType, area = h.area,
             totalPrice = h.totalPrice, unitPrice = h.unitPrice, orientation = h.orientation, decoration = h.decoration,
             elevator = h.elevator, floorDesc = h.floorDesc, age = h.age, subDistrict = h.subDistrict,
-            publishDateDesc = h.publishDateDesc, createTime = now, updateTime = now
+            publishDateDesc = h.publishDateDesc, tags = h.tags, lastFetchTime = Some(now), createTime = now, updateTime = now
           )
         } else {
           DBIO.successful(0)

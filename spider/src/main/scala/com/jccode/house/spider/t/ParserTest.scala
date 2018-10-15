@@ -31,5 +31,5 @@ object ParserTest extends App {
     println(json)
   }
 
-  housingEstateParser()
+  houseParser()
 }
