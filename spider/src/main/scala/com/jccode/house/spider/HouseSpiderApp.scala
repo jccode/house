@@ -46,7 +46,8 @@ object HouseSpiderApp {
             publishDateDesc = h.publishDateDesc, tags = h.tags, lastFetchTime = Some(now), createTime = now, updateTime = now
           )
         } else {
-          DBIO.successful(0)
+          //DBIO.successful(0)
+          houses.filter(_.url === h.url).map(x => (x.unitPrice, x.totalPrice, x.lastFetchTime)).update((h.unitPrice, h.totalPrice, Some(now)))
         }
       }
       val action2 = housingEstates.filter(_.no === h.housingEstateNo).exists.result.flatMap { exist =>
